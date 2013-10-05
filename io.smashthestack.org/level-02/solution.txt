@@ -1,0 +1,7 @@
+Pass INT_MIN (-2^31) and -1 to executable.
+
+./level02 $(python -c "print -2**31") -1
+
+Read man page of strtod. Send "NaN" as argument to executable.
+
+./level02_alt "NaN"
